@@ -1,4 +1,4 @@
-// Lauren Fonteyn and Stefan ? (2016) 
+// Lauren Fonteyn and Stefan Hartmann (2016) 
 
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 70, left: 50},
