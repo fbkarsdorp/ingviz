@@ -54,6 +54,10 @@ d3.csv("data.tsv", function(error, data) {
 
     legendSpace = width / dataNest.length; // spacing for the legend
 
+    var div = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);    
+
     // Loop through each category / key
     dataNest.forEach(function(d, i) { 
 
@@ -74,8 +78,21 @@ d3.csv("data.tsv", function(error, data) {
                 .attr("id", 'circle_' + i + d.key.replace(/\s+/g, '')) // assign ID
                 .style('fill', function () {
                       return color(d.key)})
-                .attr("r", 3.5);
-        })
+                .attr("r", 3.5)
+        .on("mouseover", function() {  
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div.html(d.active ? "" : "F = " + d3.round(xx.frequency, 2))
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 18) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(200)      
+                .style("opacity", 0);   
+        });                
+        });
 
         // Add the Legend
         svg.append("text")
