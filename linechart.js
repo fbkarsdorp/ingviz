@@ -2,8 +2,8 @@
 
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 70, left: 50},
-    width = 900 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
 
 // Set the ranges
 var x = d3.scale.ordinal()
@@ -57,12 +57,25 @@ d3.csv("data.tsv", function(error, data) {
     // Loop through each category / key
     dataNest.forEach(function(d, i) { 
 
+        console.log(d);
+
         svg.append("path")
             .attr("class", "line")
             .style("stroke", function() { // Add the colours dynamically
                 return d.color = color(d.key); })
             .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
             .attr("d", frequencyline(d.values));
+
+        d.values.forEach(function (xx, i) {
+            svg.append("circle")
+                .attr("class", "circle")
+                .attr("cx", x(xx.period))
+                .attr("cy", y(xx.frequency))
+                .attr("id", 'circle_' + i + d.key.replace(/\s+/g, '')) // assign ID
+                .style('fill', function () {
+                      return color(d.key)})
+                .attr("r", 3.5);
+        })
 
         // Add the Legend
         svg.append("text")
@@ -94,7 +107,15 @@ function updateData() {
             .duration(750)
             .attr("d", frequencyline(d.values))
             .style("opacity", d.active ? 0 : 1);
+
+        d.values.forEach(function(xx, ii) {
+            svg.select("#circle_" + ii + d.key.replace(/\s+/g, ''))
+            .duration(750)
+            .attr("cx", x(xx.period))
+            .attr("cy", y(xx.frequency))
+            .style("opacity", d.active ? 0 : 1);
         })
+    })
 
     svg.select(".y.axis") // update the y axis
         .duration(750)
