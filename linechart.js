@@ -1,9 +1,9 @@
-// Lauren Fonteyn and Stefan ? (2016) 
+// Lauren Fonteyn and Stefan Hartmann (2016) 
 
 // Set the dimensions of the canvas / graph
 var margin = {top: 30, right: 20, bottom: 70, left: 50},
-    width = 900 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
 
 // Set the ranges
 var x = d3.scale.ordinal()
@@ -54,8 +54,14 @@ d3.csv("data.tsv", function(error, data) {
 
     legendSpace = width / dataNest.length; // spacing for the legend
 
+    var div = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);    
+
     // Loop through each category / key
     dataNest.forEach(function(d, i) { 
+
+        console.log(d);
 
         svg.append("path")
             .attr("class", "line")
@@ -63,6 +69,30 @@ d3.csv("data.tsv", function(error, data) {
                 return d.color = color(d.key); })
             .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
             .attr("d", frequencyline(d.values));
+
+        d.values.forEach(function (xx, i) {
+            svg.append("circle")
+                .attr("class", "circle")
+                .attr("cx", x(xx.period))
+                .attr("cy", y(xx.frequency))
+                .attr("id", 'circle_' + i + d.key.replace(/\s+/g, '')) // assign ID
+                .style('fill', function () {
+                      return color(d.key)})
+                .attr("r", 3.5)
+        .on("mouseover", function() {  
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div.html(d.active ? "" : "F = " + d3.round(xx.frequency, 2))
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 18) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(200)      
+                .style("opacity", 0);   
+        });                
+        });
 
         // Add the Legend
         svg.append("text")
@@ -94,7 +124,15 @@ function updateData() {
             .duration(750)
             .attr("d", frequencyline(d.values))
             .style("opacity", d.active ? 0 : 1);
+
+        d.values.forEach(function(xx, ii) {
+            svg.select("#circle_" + ii + d.key.replace(/\s+/g, ''))
+            .duration(750)
+            .attr("cx", x(xx.period))
+            .attr("cy", y(xx.frequency))
+            .style("opacity", d.active ? 0 : 1);
         })
+    })
 
     svg.select(".y.axis") // update the y axis
         .duration(750)
